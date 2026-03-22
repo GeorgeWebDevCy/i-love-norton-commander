@@ -18,7 +18,8 @@
         "height": 700,
         "minWidth": 800,
         "minHeight": 500,
-        "center": true
+        "center": true,
+        "maximized": true
       }
     ],
     "security": {
@@ -35,13 +36,5 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
-  },
-  "plugins": {
-    "fs": {
-      "scope": {
-        "allow": ["**"],
-        "deny": []
-      }
-    }
   }
 }
