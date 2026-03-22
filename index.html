@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/src/styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>I Love Norton Commander</title>
+    <script type="module" src="/src/main.ts" defer></script>
+  </head>
+  <body>
+    <div id="app">
+      <header class="menu-bar">
+        <div class="brand-lockup">
+          <span class="brand-kicker">ILNC</span>
+          <span class="brand-title">I Love Norton Commander</span>
+        </div>
+        <div class="menu-strip">
+          <button type="button" class="menu-item" data-menu="install">Install</button>
+          <button type="button" class="menu-item" data-menu="tools">Tools</button>
+          <button type="button" class="menu-item" data-menu="left">Left</button>
+          <button type="button" class="menu-item" data-menu="file">File</button>
+          <button type="button" class="menu-item" data-menu="commands">Commands</button>
+          <button type="button" class="menu-item" data-menu="options">Options</button>
+          <button type="button" class="menu-item" data-menu="right">Right</button>
+        </div>
+        <div class="menu-hint">F1 Install • F2 Tools • Tab swaps panes</div>
+      </header>
+
+      <main class="main-area">
+        <section class="panel left-panel" id="left-panel">
+          <div class="panel-header">
+            <div class="panel-topline">
+              <span class="panel-label">Left Pane</span>
+              <select class="drive-select" id="left-drive-select"></select>
+            </div>
+            <input type="text" class="path-input" id="left-path" readonly />
+          </div>
+          <div class="file-list-header">
+            <button type="button" class="sort-button col-name" data-sort="name">Name</button>
+            <button type="button" class="sort-button col-ext" data-sort="ext">Ext</button>
+            <button type="button" class="sort-button col-size" data-sort="size">Size</button>
+            <button type="button" class="sort-button col-date" data-sort="date">Date</button>
+          </div>
+          <div class="file-list" id="left-file-list"></div>
+          <div class="panel-footer">
+            <span class="item-count" id="left-item-count">0 items</span>
+            <span class="selected-info" id="left-selected-info">Nothing selected</span>
+          </div>
+        </section>
+
+        <div class="panel-divider" aria-hidden="true"></div>
+
+        <section class="panel right-panel" id="right-panel">
+          <div class="panel-header">
+            <div class="panel-topline">
+              <span class="panel-label">Right Pane</span>
+              <select class="drive-select" id="right-drive-select"></select>
+            </div>
+            <input type="text" class="path-input" id="right-path" readonly />
+          </div>
+          <div class="file-list-header">
+            <button type="button" class="sort-button col-name" data-sort="name">Name</button>
+            <button type="button" class="sort-button col-ext" data-sort="ext">Ext</button>
+            <button type="button" class="sort-button col-size" data-sort="size">Size</button>
+            <button type="button" class="sort-button col-date" data-sort="date">Date</button>
+          </div>
+          <div class="file-list" id="right-file-list"></div>
+          <div class="panel-footer">
+            <span class="item-count" id="right-item-count">0 items</span>
+            <span class="selected-info" id="right-selected-info">Nothing selected</span>
+          </div>
+        </section>
+      </main>
+
+      <section class="command-bar">
+        <div class="command-buttons">
+          <button type="button" class="command-button" data-command="copy">Copy (F5)</button>
+          <button type="button" class="command-button" data-command="move">Move (F6)</button>
+          <button type="button" class="command-button" data-command="new-folder">New Folder (F7)</button>
+          <button type="button" class="command-button" data-command="delete">Delete (F8)</button>
+          <button type="button" class="command-button" data-command="rename">Rename (F9)</button>
+        </div>
+      </section>
+
+      <footer class="bottom-bar">
+        <label class="filter-box">
+          <span>Filter</span>
+          <input type="text" id="filter-input" placeholder="*.txt" />
+        </label>
+        <div class="status-bar" id="status-bar" data-tone="info">Booting commander...</div>
+      </footer>
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay hidden">
+      <div class="modal" id="modal">
+        <div class="modal-header" id="modal-header">Title</div>
+        <div class="modal-content" id="modal-content"></div>
+        <div class="modal-buttons" id="modal-buttons"></div>
+      </div>
+    </div>
+  </body>
+</html>
