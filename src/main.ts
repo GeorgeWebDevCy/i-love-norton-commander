@@ -631,6 +631,12 @@ async function openSelection(panelId: PanelId): Promise<void> {
   }
 
   try {
+    if (isWindowsExecutable(entry.path)) {
+      await invoke("launch_path", { path: entry.path });
+      setStatus(`Launched ${entry.name}`, "success");
+      return;
+    }
+
     await openPath(entry.path);
     setStatus(`Opened ${entry.name}`, "success");
   } catch (error) {
@@ -1062,6 +1068,11 @@ function isWindowsRoot(path: string): boolean {
 function getExtension(name: string): string {
   const parts = name.split(".");
   return parts.length > 1 ? parts[parts.length - 1] ?? "" : "";
+}
+
+function isWindowsExecutable(path: string): boolean {
+  const extension = path.split(".").pop()?.toLowerCase();
+  return ["exe", "com", "bat", "cmd", "msi"].includes(extension ?? "");
 }
 
 function matchesFilter(name: string, rawPattern: string): boolean {

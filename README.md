@@ -2,14 +2,23 @@
 
 A Tauri desktop app that recreates the dual-pane file-manager feel of Norton Commander with a modern TypeScript frontend and native filesystem commands.
 
+![I Love Norton Commander overview](docs/graphics/commander-overview.png)
+
+## Docs
+
+- [How the app works](docs/how-it-works.md)
+- [UI overview screenshot](docs/graphics/commander-overview.png)
+
 ## Current Features
 
 - Dual-pane directory browsing with drive selection
 - Keyboard-first navigation with `Tab`, `Enter`, `Backspace`, and `F5` through `F9`
+- `Enter` launches Windows executables such as `.exe`, `.bat`, `.cmd`, `.com`, and `.msi`
 - Sorting by name, extension, size, or modified date
 - File and folder operations: copy, move, rename, delete, and create directory
 - Tools modal for quick actions like swapping panes, revealing selections, and copying paths
 - Install modal with local setup and build guidance for the Tauri toolchain
+- Windows NSIS installer with automatic WebView2 bootstrap when the runtime is missing
 
 ## Local Setup
 
@@ -30,6 +39,8 @@ To build distributables:
 ```sh
 npm run tauri build
 ```
+
+The Windows bundle is configured to generate an NSIS installer and automatically install the WebView2 runtime when needed.
 
 ## Notes
 

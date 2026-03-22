@@ -4,6 +4,7 @@ use std::{
     fs,
     io,
     path::{Path, PathBuf},
+    process::Command,
     time::UNIX_EPOCH,
 };
 
@@ -150,6 +151,35 @@ fn create_directory(path: String) -> Result<(), String> {
     fs::create_dir_all(&path).map_err(|error| format!("Failed to create directory {}: {}", path, error))
 }
 
+#[tauri::command]
+fn launch_path(path: String) -> Result<(), String> {
+    let path = PathBuf::from(&path);
+    if !path.exists() {
+        return Err(format!("Path does not exist: {}", path.display()));
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        let status = Command::new("cmd")
+            .args(["/C", "start", "", &path.to_string_lossy()])
+            .spawn()
+            .map_err(|error| format!("Failed to launch {}: {}", path.display(), error))?;
+
+        info!("Launched process {} for {}", status.id(), path.display());
+        return Ok(());
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    {
+        let status = Command::new(&path)
+            .spawn()
+            .map_err(|error| format!("Failed to launch {}: {}", path.display(), error))?;
+
+        info!("Launched process {} for {}", status.id(), path.display());
+        Ok(())
+    }
+}
+
 fn ensure_copyable(source: &Path, destination: &Path) -> Result<(), String> {
     if !source.exists() {
         return Err(format!("Source does not exist: {}", source.display()));
@@ -215,7 +245,8 @@ pub fn run() {
             move_file,
             delete_file,
             rename_file,
-            create_directory
+            create_directory,
+            launch_path
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
