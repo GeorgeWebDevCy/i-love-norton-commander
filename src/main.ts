@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { openPath, openUrl, revealItemInDir } from "@tauri-apps/plugin-opener";
 
 type PanelId = "left" | "right";
@@ -87,6 +88,7 @@ const modalOverlay = required<HTMLElement>("#modal-overlay");
 const modalHeader = required<HTMLElement>("#modal-header");
 const modalContent = required<HTMLElement>("#modal-content");
 const modalButtons = required<HTMLElement>("#modal-buttons");
+const appWindow = getCurrentWindow();
 
 let resolveModal: ((value: string) => void) | null = null;
 
@@ -128,11 +130,12 @@ function required<T extends Element>(selector: string): T {
 
 async function bootstrap(): Promise<void> {
   try {
+    await ensureImmersiveWindow();
     bindEvents();
     await initializePanels();
     renderAll();
     setStatus(
-      "Commander ready. Use Enter to open, Tab to swap panes, and F5-F9 for actions.",
+      "Commander ready. Use Enter to open, F11 to toggle fullscreen, and F5-F9 for actions.",
       "info",
     );
   } catch (error) {
@@ -497,6 +500,10 @@ function otherPanel(panelId: PanelId): PanelId {
 
 async function handleShortcut(event: KeyboardEvent): Promise<void> {
   switch (event.key) {
+    case "Escape":
+      event.preventDefault();
+      await exitFullscreenShell();
+      return;
     case "Tab":
       event.preventDefault();
       setActivePanel(otherPanel(state.activePanel));
@@ -516,6 +523,10 @@ async function handleShortcut(event: KeyboardEvent): Promise<void> {
     case "Backspace":
       event.preventDefault();
       await openParent(state.activePanel);
+      return;
+    case "F11":
+      event.preventDefault();
+      await toggleFullscreenShell();
       return;
     case "F1":
       event.preventDefault();
@@ -800,6 +811,7 @@ async function openShortcuts(): Promise<void> {
         <p><strong>Arrow Up / Down</strong> moves the selection.</p>
         <p><strong>Enter</strong> opens a folder or launches a file.</p>
         <p><strong>Backspace</strong> goes to the parent directory.</p>
+        <p><strong>F11</strong> toggles the fullscreen shell and <strong>Esc</strong> returns to a normal window.</p>
         <p><strong>F1</strong> opens install help and <strong>F2</strong> opens tools.</p>
         <p><strong>F5-F9</strong> map to Copy, Move, New Folder, Delete, and Rename.</p>
         <p><strong>Ctrl/Cmd + R</strong> refreshes both panes.</p>
@@ -810,6 +822,7 @@ async function openShortcuts(): Promise<void> {
 }
 
 async function openToolsCenter(): Promise<void> {
+  const fullscreen = await appWindow.isFullscreen();
   const choice = await showModal({
     title: "Tools",
     html: `
@@ -817,6 +830,7 @@ async function openToolsCenter(): Promise<void> {
       <div class="modal-grid">
         <button type="button" class="modal-action" data-modal-action="refresh-both">Refresh both panes</button>
         <button type="button" class="modal-action" data-modal-action="swap-panels">Swap panel locations</button>
+        <button type="button" class="modal-action" data-modal-action="toggle-fullscreen">${fullscreen ? "Leave fullscreen shell" : "Enter fullscreen shell"}</button>
         <button type="button" class="modal-action" data-modal-action="copy-path">Copy active path</button>
         <button type="button" class="modal-action" data-modal-action="open-folder">Open active folder</button>
         <button type="button" class="modal-action" data-modal-action="reveal-item">Reveal selected item</button>
@@ -833,6 +847,9 @@ async function openToolsCenter(): Promise<void> {
       break;
     case "swap-panels":
       await swapPanels();
+      break;
+    case "toggle-fullscreen":
+      await toggleFullscreenShell();
       break;
     case "copy-path":
       await copyActivePath();
@@ -866,7 +883,7 @@ async function openInstallCenter(): Promise<void> {
         <button type="button" class="modal-command" data-copy="npm run tauri dev">npm run tauri dev</button>
         <button type="button" class="modal-command" data-copy="npm run tauri build">npm run tauri build</button>
       </div>
-      <p class="modal-copy muted">This shell currently does not have <code>cargo</code> on PATH, so Rust still needs to be installed before native builds can run here.</p>
+      <p class="modal-copy muted">The packaged Windows installer bootstraps WebView2 automatically, but local source builds still need Rust and the Visual Studio C++ tools.</p>
       <button type="button" class="link-button" data-open-url="https://tauri.app/start/prerequisites/">Open Tauri prerequisites</button>
     `,
     buttons: [{ label: "Close", value: "close", variant: "primary" }],
@@ -992,6 +1009,49 @@ async function copyToClipboard(text: string): Promise<void> {
   } catch {
     window.prompt("Copy to clipboard:", text);
     setStatus("Clipboard access fell back to a prompt.", "info");
+  }
+}
+
+async function ensureImmersiveWindow(): Promise<void> {
+  try {
+    await appWindow.setDecorations(false);
+    await appWindow.setFullscreen(true);
+  } catch (error) {
+    console.error("Unable to enter immersive mode.", error);
+  }
+}
+
+async function toggleFullscreenShell(): Promise<void> {
+  try {
+    const fullscreen = await appWindow.isFullscreen();
+    if (fullscreen) {
+      await appWindow.setFullscreen(false);
+      await appWindow.setDecorations(true);
+      await appWindow.maximize();
+      setStatus("Exited fullscreen shell. Press F11 to jump back in.", "info");
+      return;
+    }
+
+    await appWindow.setDecorations(false);
+    await appWindow.setFullscreen(true);
+    setStatus("Fullscreen shell enabled.", "success");
+  } catch (error) {
+    setStatus(getErrorMessage(error), "error");
+  }
+}
+
+async function exitFullscreenShell(): Promise<void> {
+  try {
+    if (!(await appWindow.isFullscreen())) {
+      return;
+    }
+
+    await appWindow.setFullscreen(false);
+    await appWindow.setDecorations(true);
+    await appWindow.maximize();
+    setStatus("Exited fullscreen shell. Press F11 to jump back in.", "info");
+  } catch (error) {
+    setStatus(getErrorMessage(error), "error");
   }
 }
 

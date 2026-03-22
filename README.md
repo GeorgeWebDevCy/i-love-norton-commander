@@ -11,8 +11,10 @@ A Tauri desktop app that recreates the dual-pane file-manager feel of Norton Com
 
 ## Current Features
 
+- Borderless fullscreen shell on launch so the app can take over the screen instead of looking like a standard Windows window
 - Dual-pane directory browsing with drive selection
 - Keyboard-first navigation with `Tab`, `Enter`, `Backspace`, and `F5` through `F9`
+- `F11` toggles fullscreen mode and `Esc` drops back to a normal maximized window
 - `Enter` launches Windows executables such as `.exe`, `.bat`, `.cmd`, `.com`, and `.msi`
 - Sorting by name, extension, size, or modified date
 - File and folder operations: copy, move, rename, delete, and create directory

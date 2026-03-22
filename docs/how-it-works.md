@@ -6,6 +6,7 @@ This guide explains what the app does today, how the two-pane workflow behaves, 
 
 ## What You See
 
+- The app launches in a borderless fullscreen shell so the commander UI fills the screen instead of sitting inside normal Windows chrome.
 - The menu bar is the top control strip for Install, Tools, File actions, and command help.
 - The left and right panes each track their own current directory, sort order, selection, and drive.
 - The divider keeps the commander-style "active pane vs target pane" model clear.
@@ -82,6 +83,8 @@ That means the app treats launchable files like commands instead of only handing
 | `Arrow Up` / `Arrow Down` | Move selection |
 | `Enter` | Open a folder, open a file, or launch an executable |
 | `Backspace` | Go to the parent directory |
+| `F11` | Toggle the fullscreen shell |
+| `Esc` | Leave fullscreen and return to a normal maximized window |
 | `F1` | Open install help |
 | `F2` | Open the tools menu |
 | `F5` | Copy selected item |
